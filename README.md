@@ -1,5 +1,5 @@
-# boykisser-birdr
-
+# Birdr API
+[Birdr](https://birdr.vercel.app/) is a social platform made by [Cyteon](https://github.com/Cyteon). This is a TS library for it!
 To install dependencies:
 
 ```bash
