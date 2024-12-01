@@ -29,7 +29,7 @@ export class Client {
     try {
       const response: types.LoginResponse = await axiosCreds.post(url, data, {
         headers: {
-          "User-Agent": "BoykisserBot Meow!",
+          "User-Agent": "BirdrAPI-Gizzy",
           "Content-Type": "application/json",
         },
       });
@@ -97,7 +97,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
           },
         },
@@ -121,7 +121,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/posts/${postId}`,
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
           },
         },
@@ -154,7 +154,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
           },
         },
@@ -183,7 +183,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
           },
         },
@@ -210,7 +210,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
           },
         },
@@ -273,7 +273,7 @@ export class Client {
         { avatar: avatarData },
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -299,7 +299,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/auth/logout`,
         {
           headers: {
-            "User-Agent": "BoykisserBot Meow!",
+            "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
