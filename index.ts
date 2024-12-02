@@ -1,21 +1,9 @@
 import { Client } from "./lib/apiRequests";
 const client = new Client();
 
-client
-  .login("IDENTIFIER", "PASSWORD")
-  .then(() => {
-    client
-      .sendMessage("Test")
-      .then((data) => {
-        console.log("Fetched data:", data);
-        client.logout().then((logoutdata) => {
-          console.log("Logout Data", logoutdata);
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  })
-  .catch((error) => {
-    console.error("Error logging in:", error);
-  });
+const test1 = await client.login(
+  "qYOoV+DUkwcfE2OC0N5ysqmIp0t8pokHI0kvfT65N8BKmXri+kXq2iT5d4OVT7Dx",
+);
+const test2 = await client.sendMessage("Test!");
+const test3 = await client.logout();
+console.log("Test 1", test1);

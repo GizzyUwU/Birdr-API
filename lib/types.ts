@@ -1,11 +1,28 @@
-export interface LoginRequest {
-  identifier: string;
-  password: string;
+export interface user {
+  data: {
+    _id: string;
+    email: string;
+    username: string;
+    displayName: string;
+    staff: boolean;
+    verified: boolean;
+    banned: boolean;
+    avatarUrl: string;
+    __v: number;
+    otherBadges: string[];
+  };
+  status: number;
 }
 
-export interface LoginResponse {
+export interface message {
   data: {
-    message: string;
-    token: string;
+    content: string;
+    authorId: string;
+    mentions: { [key: string]: string };
+    ogData: {};
+    pinned: boolean;
+    _id: string;
+    postedAt: Date;
+    __v: number;
   };
 }

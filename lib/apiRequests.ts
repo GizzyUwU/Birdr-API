@@ -1,96 +1,37 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import mime from "mime-types";
+import mime from "mime";
 import * as types from "./types";
-const axiosCreds = axios.create({
-  withCredentials: true,
-});
 
 export class Client {
   private token: string | null = null;
 
-  constructor() {}
+  public async login(token: string): Promise<types.user> {
+    if (this.token) return Promise.reject("Already logged in.");
 
-  /**
-   * Logs in the user using the provided credentials and stores the token in memory.
-   * @param identifier The user's identifier (e.g., username, email).
-   * @param password The user's password.
-   * @returns The token received from the login API.
-   */
-  public async login(identifier: string, password: string): Promise<void> {
-    if (this.token) {
-      console.log("Already logged in.");
-      return;
-    }
-
-    const url = "https://birdr.vercel.app/api/v1/auth/login";
-    const data: types.LoginRequest = { identifier, password };
+    const url = "https://birdr.vercel.app/api/v1/users/@me";
     try {
-      const response: types.LoginResponse = await axiosCreds.post(url, data, {
+      const response = await axios.get(url, {
         headers: {
           "User-Agent": "BirdrAPI-Gizzy",
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
-      const token = response.data.token;
-
-      if (token) {
-        this.token = token;
-        axiosCreds.interceptors.request.use(
-          (config) => {
-            config.headers["Cookie"] = `token=${token}`;
-            return config;
-          },
-          (error) => {
-            return Promise.reject(error);
-          },
-        );
-        console.log("Login successful");
-      } else {
-        throw new Error("Token not received");
-      }
+      this.token = token;
+      return response;
     } catch (error: any) {
-      console.error("Login failed:", error.response?.data || error.message);
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
 
-  /**
-   * Returns the stored token if it exists in memory, otherwise logs in first.
-   * @param identifier The user's identifier (e.g., username, email).
-   * @param password The user's password.
-   * @returns The stored token.
-   */
-  public async getToken(identifier: string, password: string): Promise<string> {
-    if (this.token) {
-      return this.token;
-    }
-
-    await this.login(identifier, password);
-    return this.token as string;
-  }
-
-  /**
-   * Checks if the client is logged in and has a valid token.
-   * @returns True if the client has a valid token, false otherwise.
-   */
-  public isLoggedIn(): boolean {
-    return this.token !== null;
-  }
-
-  /**
-   * Example API method that uses the token stored in memory.
-   * @param endpoint API endpoint to call.
-   * @returns Response data from the API.
-   */
-  public async sendMessage(content: string): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
+  public async sendMessage(content: string): Promise<types.message> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
 
     try {
-      const response = await axiosCreds.put(
+      const response = await axios.put(
         "https://birdr.vercel.app/api/v1/posts",
         {
           content,
@@ -99,137 +40,185 @@ export class Client {
           headers: {
             "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
           },
         },
       );
-      return response.data;
+      return response;
     } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
-  public async deleteMessage(postId: string): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
+
+  public async sendComment(content: string): Promise<types.message> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
 
     try {
-      const response = await axiosCreds.delete(
+      const response = await axios.put(
+        "https://birdr.vercel.app/api/v1/posts",
+        {
+          content,
+        },
+        {
+          headers: {
+            "User-Agent": "BirdrAPI-Gizzy",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
+  public async deleteComment(
+    postId: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+
+    try {
+      const response = await axios.delete(
+        `https://birdr.vercel.app/api/v1/comments/${postId}`,
+        {
+          headers: {
+            "User-Agent": "BirdrAPI-Gizzy",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
+  public async deleteMessage(
+    postId: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+
+    try {
+      const response = await axios.delete(
         `https://birdr.vercel.app/api/v1/posts/${postId}`,
         {
           headers: {
             "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
           },
         },
       );
-      return response.data;
+      return response;
     } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
-  public async reportMessage(
+
+  public async deleteFollow(
+    username: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+    username = username.toLowerCase();
+    try {
+      const response = await axios.delete(
+        `https://birdr.vercel.app/api/v1/users/${username}/follov`,
+        {
+          headers: {
+            "User-Agent": "BirdrAPI-Gizzy",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
+  public async follow(
+    username: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+    username = username.toLowerCase();
+    try {
+      const response = await axios.put(
+        `https://birdr.vercel.app/api/v1/users/${username}/follov`,
+        {
+          headers: {
+            "User-Agent": "BirdrAPI-Gizzy",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
+  public async report(
     postId: string,
     content: string,
+    type: string,
     authorId: string,
-  ): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+
+    const reportData: {
+      content: string;
+      authorId: string;
+      [key: string]: string;
+    } = {
+      content,
+      authorId,
+    };
+
+    if (type === "comment") {
+      reportData.commentId = postId;
+    } else if (type === "post") {
+      reportData.postId = postId;
+    } else {
+      return Promise.reject(
+        "Invalid type. Must be either 'post' or 'comment'.",
+      );
     }
 
     try {
-      const response = await axiosCreds.post(
+      const response = await axios.post(
         `https://birdr.vercel.app/api/v1/reports`,
-        {
-          postId,
-          content,
-          authorId,
-        },
+        reportData,
         {
           headers: {
             "User-Agent": "BirdrAPI-Gizzy",
             "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
           },
         },
       );
       return response.data;
     } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
 
-  public async changeUsername(username: string): Promise<any> {
-    username = username.toLowerCase();
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
-
-    try {
-      const response = await axiosCreds.patch(
-        `https://birdr.vercel.app/api/v1/users/@me`,
-        {
-          username,
-        },
-        {
-          headers: {
-            "User-Agent": "BirdrAPI-Gizzy",
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      return response.data;
-    } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
-    }
-  }
-  public async changeDisplayName(displayName: string): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
-
-    try {
-      const response = await axiosCreds.patch(
-        `https://birdr.vercel.app/api/v1/users/@me`,
-        {
-          displayName,
-        },
-        {
-          headers: {
-            "User-Agent": "BirdrAPI-Gizzy",
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      return response.data;
-    } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
-    }
-  }
-  public async changeAvatar(avatar: string): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
-
-    let avatarData: string;
+  public async updateUserInfo(updates: {
+    username?: string;
+    displayName?: string;
+    avatar?: string;
+  }): Promise<types.user> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
 
     const allowedMimeTypes = [
       "image/png",
@@ -239,38 +228,52 @@ export class Client {
     ];
 
     try {
-      if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
-        const response = await axios.get(avatar, {
-          responseType: "arraybuffer",
-        });
-        const buffer = Buffer.from(response.data, "binary");
-        const mimeType = mime.lookup(avatar);
-
-        if (!mimeType || !allowedMimeTypes.includes(mimeType)) {
-          throw new Error(
-            "Unsupported image type. Only PNG, JPG, JPEG, and GIF are allowed.",
-          );
-        }
-
-        avatarData = `data:${mimeType};base64,${buffer.toString("base64")}`;
-      } else if (fs.existsSync(avatar)) {
-        const filePath = path.resolve(avatar);
-        const buffer = fs.readFileSync(filePath);
-        const mimeType = mime.lookup(filePath);
-
-        if (!mimeType || !allowedMimeTypes.includes(mimeType)) {
-          throw new Error(
-            "Unsupported image type. Only PNG, JPG, JPEG, and GIF are allowed.",
-          );
-        }
-
-        avatarData = `data:${mimeType};base64,${buffer.toString("base64")}`;
-      } else {
-        throw new Error("Avatar is neither a valid file path nor URL.");
+      if (updates.username) {
+        updates.username = updates.username.toLowerCase();
       }
-      const response = await axios.patch(
+
+      if (updates.avatar) {
+        let avatarData: string;
+
+        if (
+          updates.avatar.startsWith("http://") ||
+          updates.avatar.startsWith("https://")
+        ) {
+          const response = await axios.get(updates.avatar, {
+            responseType: "arraybuffer",
+          });
+          const buffer = Buffer.from(response.data, "binary");
+          const mimeType = mime.getType(updates.avatar);
+
+          if (!mimeType || !allowedMimeTypes.includes(mimeType)) {
+            throw new Error(
+              "Unsupported image type. Only PNG, JPG, JPEG, and GIF are allowed.",
+            );
+          }
+
+          avatarData = `data:${mimeType};base64,${buffer.toString("base64")}`;
+        } else if (fs.existsSync(updates.avatar)) {
+          const filePath = path.resolve(updates.avatar);
+          const buffer = fs.readFileSync(filePath);
+          const mimeType = mime.getType(filePath);
+
+          if (!mimeType || !allowedMimeTypes.includes(mimeType)) {
+            return Promise.reject(
+              "Unsupported image type. Only PNG, JPG, JPEG, and GIF are allowed.",
+            );
+          }
+
+          avatarData = `data:${mimeType};base64,${buffer.toString("base64")}`;
+        } else {
+          return Promise.reject("Avatar is neither a valid file path nor URL.");
+        }
+
+        updates.avatar = avatarData;
+      }
+
+      const response: types.user = await axios.patch(
         `https://birdr.vercel.app/api/v1/users/@me`,
-        { avatar: avatarData },
+        updates,
         {
           headers: {
             "User-Agent": "BirdrAPI-Gizzy",
@@ -280,22 +283,18 @@ export class Client {
         },
       );
 
-      return response.data;
+      return response;
     } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
-  public async logout(): Promise<any> {
-    if (!this.token) {
-      throw new Error("Not logged in. Please call login() first.");
-    }
+
+  public async logout(): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
 
     try {
-      const response = await axiosCreds.post(
+      const response = await axios.post(
         `https://birdr.vercel.app/api/v1/auth/logout`,
         {
           headers: {
@@ -305,13 +304,9 @@ export class Client {
           },
         },
       );
-      return response.data;
+      return response;
     } catch (error: any) {
-      console.error(
-        "API request failed:",
-        error.response?.data || error.message,
-      );
-      throw error;
+      return Promise.reject(error.response?.data || error.message);
     }
   }
 }
