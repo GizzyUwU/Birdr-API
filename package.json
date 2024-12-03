@@ -1,15 +1,12 @@
 {
-  "name": "birdr-api",
+  "name": "birdr-ts",
   "module": "index.ts",
   "type": "module",
-  "version": "1.0.0",
-  "description": "API Lib for Birdr",
+  "version": "2.0.1",
+  "description": "API Library for Birdr",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "directories": {
-    "lib": "lib"
   },
   "devDependencies": {
     "@types/bun": "latest"
