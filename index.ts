@@ -14,7 +14,7 @@ export class Client {
     try {
       const response = await axios.get(url, {
         headers: {
-          "User-Agent": "BirdrTS-Gizzy",
+          "User-Agent": "BirdrTS",
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
@@ -38,7 +38,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -65,7 +65,7 @@ export class Client {
         },
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -88,7 +88,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/comments/${commentId}`,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -111,7 +111,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/posts/${postId}`,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -134,7 +134,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/users/${username}/follov`,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -157,7 +157,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/users/${username}/follov`,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -203,11 +203,10 @@ export class Client {
         reportData,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
-          b,
         },
       );
       return response.data;
@@ -280,7 +279,7 @@ export class Client {
         updates,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
@@ -302,7 +301,7 @@ export class Client {
         `https://birdr.vercel.app/api/v1/auth/logout`,
         {
           headers: {
-            "User-Agent": "BirdrTS-Gizzy",
+            "User-Agent": "BirdrTS",
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.token}`,
           },
