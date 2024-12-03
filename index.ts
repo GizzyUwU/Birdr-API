@@ -169,6 +169,50 @@ export class Client {
     }
   }
 
+  public async likePost(
+    postId: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+    try {
+      const response = await axios.put(
+        `https://birdr.vercel.app/api/v1/posts/${postId}/like`,
+        {
+          headers: {
+            "User-Agent": "BirdrTS",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
+  public async dislikePost(
+    postId: string,
+  ): Promise<{ data: { message: string } }> {
+    if (!this.token)
+      return Promise.reject("Not logged in. Please call login() first.");
+    try {
+      const response = await axios.put(
+        `https://birdr.vercel.app/api/v1/posts/${postId}/dislike`,
+        {
+          headers: {
+            "User-Agent": "BirdrTS",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+        },
+      );
+      return response;
+    } catch (error: any) {
+      return Promise.reject(error.response?.data || error.message);
+    }
+  }
+
   public async report(
     postId: string,
     content: string,
