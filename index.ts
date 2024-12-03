@@ -131,7 +131,8 @@ export class Client {
     username = username.toLowerCase();
     try {
       const response = await axios.delete(
-        `https://birdr.vercel.app/api/v1/users/${username}/follov`,
+        `https://birdr.vercel.app/api/v1/users/${username}/follow`,
+        null,
         {
           headers: {
             "User-Agent": "BirdrTS",
@@ -154,7 +155,8 @@ export class Client {
     username = username.toLowerCase();
     try {
       const response = await axios.put(
-        `https://birdr.vercel.app/api/v1/users/${username}/follov`,
+        `https://birdr.vercel.app/api/v1/users/${username}/follow`,
+        null,
         {
           headers: {
             "User-Agent": "BirdrTS",
@@ -177,6 +179,7 @@ export class Client {
     try {
       const response = await axios.put(
         `https://birdr.vercel.app/api/v1/posts/${postId}/like`,
+        null,
         {
           headers: {
             "User-Agent": "BirdrTS",
@@ -199,6 +202,7 @@ export class Client {
     try {
       const response = await axios.put(
         `https://birdr.vercel.app/api/v1/posts/${postId}/dislike`,
+        null,
         {
           headers: {
             "User-Agent": "BirdrTS",
