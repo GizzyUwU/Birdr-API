@@ -132,7 +132,6 @@ export class Client {
     try {
       const response = await axios.delete(
         `https://birdr.vercel.app/api/v1/users/${username}/follow`,
-        null,
         {
           headers: {
             "User-Agent": "BirdrTS",
