@@ -4,6 +4,7 @@ import path from "path";
 import mime from "mime";
 import * as types from "./types";
 
+<<<<<<< HEAD
 export class Client {
   private token: string | null = null;
 
